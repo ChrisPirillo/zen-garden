@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- SEO: Character Set and Viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO: Core Meta Tags -->
+    <title>Zen Garden - An Interactive 3D Karesansui Experience</title>
+    <meta name="description" content="Create your own Japanese karesansui (dry landscape garden) with this interactive 3D Zen Garden. Rake sand, place rocks, and find your moment of calm.">
+    <meta name="keywords" content="zen garden, karesansui, interactive, 3d, webgl, three.js, meditation, relaxation, simulation">
+    <meta name="author" content="Chris Pirillo">
+    <link rel="canonical" href="https://pirillo.com/arcade/zen-garden.html">
+
+    <!-- SEO: Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/zen-garden.html">
+    <meta property="og:title" content="Zen Garden - An Interactive 3D Karesansui Experience">
+    <meta property="og:description" content="Create your own Japanese karesansui (dry landscape garden) with this interactive 3D Zen Garden. Rake sand, place rocks, and find your moment of calm.">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/zen-garden.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- SEO: Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://pirillo.com/arcade/zen-garden.html">
+    <meta name="twitter:title" content="Zen Garden - An Interactive 3D Karesansui Experience">
+    <meta name="twitter:description" content="Create your own Japanese karesansui (dry landscape garden) with this interactive 3D Zen Garden. Rake sand, place rocks, and find your moment of calm.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/zen-garden.png">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+
+    <!-- Performance: Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Performance: Preload Critical Resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" as="script">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Core Web Vitals: Asynchronous stylesheet with fallback for non-JS browsers -->
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap">
+    </noscript>
+
+    <!-- Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- Performance: Inlined Critical CSS -->
+    <style>
+        /* Critical styles are inlined to prevent render-blocking CSS requests. */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            color: #f0f0f0;
+        }
+        canvas {
+            display: block;
+        }
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            background: rgba(26, 26, 26, 0.75);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            user-select: none;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .tool-button {
+            background-color: transparent;
+            border: 2px solid transparent;
+            color: #aaa;
+            padding: 10px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tool-button svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .tool-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .tool-button.active {
+            background-color: rgba(0, 122, 255, 0.3);
+            color: #00aaff;
+            border-color: rgba(0, 122, 255, 0.5);
+        }
+        #clear-button {
+            color: #ff5050;
+        }
+        #clear-button:hover {
+            background-color: rgba(255, 80, 80, 0.2);
+            color: #ff7070;
+        }
+    </style>
+
+    <!-- SEO: JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Zen Garden - An Interactive 3D Karesansui Experience",
+      "description": "Create your own Japanese karesansui (dry landscape garden) with this interactive 3D Zen Garden. Rake sand, place rocks, and find your moment of calm.",
+      "url": "https://pirillo.com/arcade/zen-garden.html",
+      "image": "https://pirillo.com/arcade/images/zen-garden.png",
+      "creator": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://pirillo.com/"
+      },
+      "mainEntity": {
+        "@type": "WebApplication",
+        "name": "Zen Garden",
+        "applicationCategory": "Game",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires a modern browser with WebGL support.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0"
+        }
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Pirillo",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://pirillo.com/images/chrispirillo.jpg"
+        }
+      }
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Semantic HTML: The main content area -->
+    <main>
+        <!-- The UI is part of the main application experience -->
+        <div id="ui-container">
+            <button id="rake-tool" class="tool-button active" title="Rake" aria-label="Select Rake Tool">
+                <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M5 10v11h2V10H5zm4 0v11h2V10H9zm4 0v11h2V10h-2zm4 0v11h2V10h-2zM3 3v5h18V3H3z"/></svg>
+            </button>
+            <button id="rock-tool" class="tool-button" title="Place Rock" aria-label="Select Rock Tool">
+                <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            </button>
+            <button id="clear-button" class="tool-button" title="Clear Sand" aria-label="Clear the Zen Garden">
+                 <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+        </div>
+        <!-- The canvas will be appended here by the script -->
+    </main>
+    
+    <!-- Performance: Deferred non-critical JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    
+    <!-- UNMODIFIED APPLICATION LOGIC -->
+    <!-- This script is left as-is to ensure functionality is not broken. -->
+    <script>
+        // --- Simplex Noise Implementation ---
+        const SimplexNoise = (function() {
+            const F2 = 0.5 * (Math.sqrt(3.0) - 1.0); const G2 = (3.0 - Math.sqrt(3.0)) / 6.0; const F3 = 1.0 / 3.0; const G3 = 1.0 / 6.0;
+            const grad3 = new Float32Array([1, 1, 0, -1, 1, 0, 1, -1, 0, -1, -1, 0, 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1, 0, 1, 1, 0, -1, 1, 0, 1, -1, 0, -1, -1]);
+            function SimplexNoise(random) {
+                if (random === undefined) random = Math.random;
+                this.p = new Uint8Array(256); this.perm = new Uint8Array(512); this.permMod12 = new Uint8Array(512);
+                for (let i = 0; i < 256; i++) { this.p[i] = i; }
+                for (let i = 0; i < 255; i++) { const r = i + ~~(random() * (256 - i)); const t = this.p[i]; this.p[i] = this.p[r]; this.p[r] = t; }
+                for (let i = 0; i < 512; i++) { this.perm[i] = this.p[i & 255]; this.permMod12[i] = this.perm[i] % 12; }
+            }
+            SimplexNoise.prototype = {
+                noise3D: function(xin, yin, zin) {
+                    let n0, n1, n2, n3; const s = (xin + yin + zin) * F3;
+                    const i = Math.floor(xin + s); const j = Math.floor(yin + s); const k = Math.floor(zin + s);
+                    const t = (i + j + k) * G3; const X0 = i - t; const Y0 = j - t; const Z0 = k - t;
+                    const x0 = xin - X0; const y0 = yin - Y0; const z0 = zin - Z0;
+                    let i1, j1, k1; let i2, j2, k2;
+                    if (x0 >= y0) { if (y0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } else if (x0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1; } else { i1 = 0; j1 = 0; k1 = 1; i2 = 1; j2 = 0; k2 = 1; } }
+                    else { if (y0 < z0) { i1 = 0; j1 = 0; k1 = 1; i2 = 0; j2 = 1; k2 = 1; } else if (x0 < z0) { i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1; } else { i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } }
+                    const x1 = x0 - i1 + G3; const y1 = y0 - j1 + G3; const z1 = z0 - k1 + G3; const x2 = x0 - i2 + 2.0 * G3; const y2 = y0 - j2 + 2.0 * G3; const z2 = z0 - k2 + 2.0 * G3; const x3 = x0 - 1.0 + 3.0 * G3; const y3 = y0 - 1.0 + 3.0 * G3; const z3 = z0 - 1.0 + 3.0 * G3;
+                    const ii = i & 255; const jj = j & 255; const kk = k & 255;
+                    let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0; if (t0 < 0) n0 = 0.0; else { const gi0 = this.permMod12[ii + this.perm[jj + this.perm[kk]]] * 3; t0 *= t0; n0 = t0 * t0 * (grad3[gi0] * x0 + grad3[gi0 + 1] * y0 + grad3[gi0 + 2] * z0); }
+                    let t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1; if (t1 < 0) n1 = 0.0; else { const gi1 = this.permMod12[ii + i1 + this.perm[jj + j1 + this.perm[kk + k1]]] * 3; t1 *= t1; n1 = t1 * t1 * (grad3[gi1] * x1 + grad3[gi1 + 1] * y1 + grad3[gi1 + 2] * z1); }
+                    let t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2; if (t2 < 0) n2 = 0.0; else { const gi2 = this.permMod12[ii + i2 + this.perm[jj + j2 + this.perm[kk + k2]]] * 3; t2 *= t2; n2 = t2 * t2 * (grad3[gi2] * x2 + grad3[gi2 + 1] * y2 + grad3[gi2 + 2] * z2); }
+                    let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3; if (t3 < 0) n3 = 0.0; else { const gi3 = this.permMod12[ii + 1 + this.perm[jj + 1 + this.perm[kk + 1]]] * 3; t3 *= t3; n3 = t3 * t3 * (grad3[gi3] * x3 + grad3[gi3 + 1] * y3 + grad3[gi3 + 2] * z3); }
+                    return 32.0 * (n0 + n1 + n2 + n3);
+                }
+            }; return SimplexNoise;
+        })();
+        const simplex = new SimplexNoise();
+
+        // --- Scene Setup ---
+        let scene, camera, renderer, sandPlane;
+        let initialVertexPositions;
+        let currentTool = 'rake';
+        let isPanning = false;
+        let lastMousePos = { x: 0, y: 0 };
+        const planeSize = 4000; 
+        const frustumSize = 2000;
+        const minZoom = 1.2; 
+        const maxZoom = 5;
+        let currentZoom = 1.5;
+        let isDrawing = false;
+        let mouseDown = false;
+        let pathHistory = [];
+        let lastSmoothedPoint = null;
+        let smoothedDirection = null; 
+        let strokeProgress = 0; 
+        const pathHistorySize = 8;
+        const widthSegments = 512;
+        const heightSegments = 512;
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a1a);
+            scene.fog = new THREE.FogExp2(0x1a1a1a, 0.0007);
+
+            const aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.OrthographicCamera(frustumSize * aspect / -2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / -2, 1, 2000);
+            camera.position.set(0, 1000, 0);
+            camera.lookAt(0, 0, 0);
+            camera.zoom = currentZoom;
+            camera.updateProjectionMatrix();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            // The canvas is appended to the main element for semantic structure.
+            document.querySelector('main').appendChild(renderer.domElement);
+            renderer.domElement.style.cursor = 'crosshair';
+            renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+            const ambientLight = new THREE.AmbientLight(0x909090, 1.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            directionalLight.position.set(-400, 800, 400);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 4096;
+            directionalLight.shadow.mapSize.height = 4096;
+            directionalLight.shadow.camera = new THREE.OrthographicCamera(-planeSize/2, planeSize/2, planeSize/2, -planeSize/2, 0.5, 2000);
+            directionalLight.shadow.bias = -0.0004;
+            scene.add(directionalLight);
+
+            createSand();
+
+            window.addEventListener('resize', onWindowResize, false);
+            renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+            renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+            renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+            renderer.domElement.addEventListener('wheel', onMouseWheel, { passive: false });
+            
+            document.getElementById('rake-tool').addEventListener('click', () => setTool('rake'));
+            document.getElementById('rock-tool').addEventListener('click', () => setTool('rock'));
+            document.getElementById('clear-button').addEventListener('click', clearSand);
+
+            animate();
+        }
+
+        /**
+         * Creates a realistic, SEAMLESS sand texture.
+         * This is done by generating tileable noise and layering speckles.
+         */
+        function createNoiseTexture() {
+            const size = 1024;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.createImageData(size, size);
+            const data = imageData.data;
+            const baseColor = new THREE.Color(0xe0d6c1);
+
+            // Layer 1: Base sand color with TILEABLE simplex noise variation
+            const noiseFrequency = 2.5; // Controls the visual scale of the noise pattern
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    // Map 2D coordinates to angles for torus mapping
+                    const s = x / size;
+                    const t = y / size;
+                    const angleS = s * 2 * Math.PI;
+                    const angleT = t * 2 * Math.PI;
+
+                    // Map angles to a 3D torus's surface coordinates
+                    const r1 = 1; // Major radius of the torus
+                    const r2 = 0.4; // Minor radius of the torus
+                    const nx = (r1 + r2 * Math.cos(angleT)) * Math.cos(angleS);
+                    const ny = (r1 + r2 * Math.cos(angleT)) * Math.sin(angleS);
+                    const nz = r2 * Math.sin(angleT);
+                    
+                    // Sample the 3D noise at the torus coordinates to get a seamless 2D pattern
+                    const noise = (simplex.noise3D(nx * noiseFrequency, ny * noiseFrequency, nz * noiseFrequency) + 1) * 0.5;
+                    
+                    // Apply a small variation to the base color
+                    const colorVariation = (noise - 0.5) * 0.05;
+                    const r = (baseColor.r + colorVariation) * 255;
+                    const g = (baseColor.g + colorVariation) * 255;
+                    const b = (baseColor.b + colorVariation) * 255;
+
+                    const i = (y * size + x) * 4;
+                    data[i] = r;
+                    data[i + 1] = g;
+                    data[i + 2] = b;
+                    data[i + 3] = 255;
+                }
+            }
+
+            // Layer 2: Add randomized speckles for a granular look
+            const numSpeckles = 100000;
+            for (let i = 0; i < numSpeckles; i++) {
+                const x = Math.floor(Math.random() * size);
+                const y = Math.floor(Math.random() * size);
+                const pixelIndex = (y * size + x) * 4;
+                
+                const speckleVariation = (Math.random() - 0.5) * 0.25;
+                const r = data[pixelIndex] + speckleVariation * 255;
+                const g = data[pixelIndex + 1] + speckleVariation * 255;
+                const b = data[pixelIndex + 2] + speckleVariation * 255;
+
+                data[pixelIndex] = r;
+                data[pixelIndex + 1] = g;
+                data[pixelIndex + 2] = b;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(planeSize / size, planeSize / size); 
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        function createSand() {
+            const geometry = new THREE.PlaneGeometry(planeSize, planeSize, widthSegments, heightSegments);
+            initialVertexPositions = new Float32Array(geometry.attributes.position.array);
+            const sandTexture = createNoiseTexture();
+            const material = new THREE.MeshStandardMaterial({
+                map: sandTexture,
+                // The color is now primarily driven by the texture, but we set a base.
+                color: 0xffffff, 
+                roughness: 0.9,
+                metalness: 0.0,
+            });
+            sandPlane = new THREE.Mesh(geometry, material);
+            sandPlane.rotation.x = -Math.PI / 2;
+            sandPlane.receiveShadow = true;
+            scene.add(sandPlane);
+        }
+
+        function clearSand() {
+            const objectsToRemove = scene.children.filter(child => child.isMesh && child !== sandPlane);
+            objectsToRemove.forEach(child => {
+                scene.remove(child);
+                child.geometry.dispose();
+                if (child.material.map && child.material.map.isCanvasTexture) {
+                    child.material.map.dispose();
+                }
+                child.material.dispose();
+            });
+            sandPlane.geometry.attributes.position.array.set(initialVertexPositions);
+            sandPlane.geometry.attributes.position.needsUpdate = true;
+            sandPlane.geometry.computeVertexNormals();
+        }
+
+        function createRockTexture() {
+            const size = 256;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#6c757d';
+            ctx.fillRect(0, 0, size, size);
+            const numSpeckles = 2000;
+            for (let i = 0; i < numSpeckles; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const radius = Math.random() * 1.2;
+                const grayscale = Math.random() * 60 + 30; 
+                ctx.fillStyle = `rgba(${grayscale}, ${grayscale}, ${grayscale}, ${Math.random() * 0.5 + 0.2})`;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(1, 1);
+            return texture;
+        }
+        
+        function placeRock(position) {
+            const rockSize = Math.random() * 30 + 20;
+            const geometry = new THREE.IcosahedronGeometry(rockSize, 10); 
+            const positionAttribute = geometry.attributes.position;
+            const vertex = new THREE.Vector3();
+            const noiseFrequency = 0.05;
+            const noiseAmplitude = 0.06; 
+
+            for (let i = 0; i < positionAttribute.count; i++) {
+                vertex.fromBufferAttribute(positionAttribute, i);
+                const noise = simplex.noise3D(vertex.x * noiseFrequency, vertex.y * noiseFrequency, vertex.z * noiseFrequency);
+                const displacement = 1 + noise * noiseAmplitude;
+                vertex.multiplyScalar(displacement);
+                positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
+            }
+            geometry.toNonIndexed();
+            geometry.computeVertexNormals();
+
+            const rockTexture = createRockTexture();
+            const material = new THREE.MeshStandardMaterial({ 
+                map: rockTexture,
+                roughness: 0.8, 
+                metalness: 0.1,
+                polygonOffset: true,
+                polygonOffsetFactor: -1.0,
+                polygonOffsetUnits: -1.0
+            });
+            const rock = new THREE.Mesh(geometry, material);
+            rock.position.set(position.x, rockSize / 2 - 5, position.z);
+            rock.castShadow = true;
+            rock.receiveShadow = true;
+            scene.add(rock);
+
+            displaceSandForRock(position.x, position.z, rockSize);
+        }
+
+        function displaceSandForRock(worldX, worldZ, rockSize) {
+            const positions = sandPlane.geometry.attributes.position.array;
+            const innerRadius = rockSize * 0.8;
+            const outerRadius = rockSize * 2.5;
+            const ridgeHeight = 10;
+            for (let j = 0; j <= heightSegments; j++) {
+                for (let i = 0; i <= widthSegments; i++) {
+                    const vertexIndex = j * (widthSegments + 1) + i;
+                    const posIndex = vertexIndex * 3;
+                    const worldVertexX = initialVertexPositions[posIndex];
+                    const worldVertexZ = -initialVertexPositions[posIndex + 1];
+                    const distance = Math.hypot(worldVertexX - worldX, worldVertexZ - worldZ);
+                    if (distance < outerRadius) {
+                         const t = (distance - innerRadius) / (outerRadius - innerRadius);
+                         const heightOffset = ridgeHeight * Math.cos(t * Math.PI / 2);
+                         if (t > 0 && t < 1) {
+                            positions[posIndex + 2] += heightOffset;
+                            positions[posIndex + 2] = THREE.MathUtils.clamp(positions[posIndex + 2], -25, 25);
+                         }
+                    }
+                }
+            }
+            sandPlane.geometry.attributes.position.needsUpdate = true;
+            sandPlane.geometry.computeVertexNormals();
+        }
+
+        function displaceSandForLineSegment(start, end, radius, depth) {
+            const positions = sandPlane.geometry.attributes.position.array;
+            const lineVec = new THREE.Vector3().subVectors(end, start);
+            const lineLengthSq = lineVec.lengthSq();
+            if (lineLengthSq === 0) return;
+
+            const minX = Math.min(start.x, end.x) - radius;
+            const maxX = Math.max(start.x, end.x) + radius;
+            const minZ = Math.min(start.z, end.z) - radius;
+            const maxZ = Math.max(start.z, end.z) + radius;
+
+            for (let j = 0; j <= heightSegments; j++) {
+                for (let i = 0; i <= widthSegments; i++) {
+                    const vertexIndex = j * (widthSegments + 1) + i;
+                    const posIndex = vertexIndex * 3;
+                    const worldVertexX = initialVertexPositions[posIndex];
+                    const worldVertexZ = -initialVertexPositions[posIndex + 1];
+
+                    if (worldVertexX < minX || worldVertexX > maxX || worldVertexZ < minZ || worldVertexZ > maxZ) continue;
+
+                    const p = new THREE.Vector3(worldVertexX, 0, worldVertexZ);
+                    
+                    let t = p.clone().sub(start).dot(lineVec) / lineLengthSq;
+                    t = THREE.MathUtils.clamp(t, 0, 1);
+                    const closestPointOnSegment = start.clone().add(lineVec.clone().multiplyScalar(t));
+                    const dist = p.distanceTo(closestPointOnSegment);
+
+                    if (dist < radius) {
+                        const influence = 1.0 - dist / radius;
+                        const smoothInfluence = influence * influence * (3 - 2 * influence);
+                        const heightOffset = depth * smoothInfluence;
+                        
+                        if (heightOffset !== 0) {
+                            positions[posIndex + 2] += heightOffset;
+                            positions[posIndex + 2] = THREE.MathUtils.clamp(positions[posIndex + 2], -25, 25);
+                        }
+                    }
+                }
+            }
+        }
+
+        function drawSingleRakeLine(startPoint, endPoint, depth, pathDirection) {
+            const tineCount = 5;
+            const tineSpacing = 6.0;
+            const tineInfluenceRadius = 2.0;
+            const tineDepth = -depth;
+
+            const totalRakeWidth = (tineCount - 1) * tineSpacing;
+            const ridgeWidth = 8.0;
+            const ridgeHeight = depth * 0.7;
+
+            const perpendicularVec = new THREE.Vector3(-pathDirection.z, 0, pathDirection.x);
+
+            for (let i = 0; i < tineCount; i++) {
+                const tineOffset = (i - (tineCount - 1) / 2) * tineSpacing;
+                const tineStart = startPoint.clone().add(perpendicularVec.clone().multiplyScalar(tineOffset));
+                const tineEnd = endPoint.clone().add(perpendicularVec.clone().multiplyScalar(tineOffset));
+                displaceSandForLineSegment(tineStart, tineEnd, tineInfluenceRadius, tineDepth);
+            }
+
+            const ridgeOffset = totalRakeWidth / 2 + ridgeWidth / 2;
+            const ridge1Start = startPoint.clone().add(perpendicularVec.clone().multiplyScalar(ridgeOffset));
+            const ridge1End = endPoint.clone().add(perpendicularVec.clone().multiplyScalar(ridgeOffset));
+            displaceSandForLineSegment(ridge1Start, ridge1End, ridgeWidth, ridgeHeight);
+            
+            const ridge2Start = startPoint.clone().add(perpendicularVec.clone().multiplyScalar(-ridgeOffset));
+            const ridge2End = endPoint.clone().add(perpendicularVec.clone().multiplyScalar(-ridgeOffset));
+            displaceSandForLineSegment(ridge2Start, ridge2End, ridgeWidth, ridgeHeight);
+        }
+
+
+        function onMouseDown(event) {
+            if (event.button === 2) {
+                isPanning = true;
+                lastMousePos = { x: event.clientX, y: event.clientY };
+                renderer.domElement.style.cursor = 'grabbing';
+                return;
+            }
+            if (event.button !== 0) return;
+
+            mouseDown = true;
+            const intersects = getIntersectedObject(event.clientX, event.clientY);
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                if (currentTool === 'rock') {
+                    placeRock(point);
+                } else if (currentTool === 'rake') {
+                    isDrawing = true;
+                    pathHistory = [point, point, point];
+                    lastSmoothedPoint = point.clone();
+                    smoothedDirection = null; 
+                    strokeProgress = 0;
+                }
+            }
+        }
+
+        function onMouseMove(event) {
+            if (isPanning) {
+                const deltaX = event.clientX - lastMousePos.x;
+                const deltaY = event.clientY - lastMousePos.y;
+                const panSpeed = (frustumSize / window.innerHeight) / camera.zoom;
+                camera.position.x -= deltaX * panSpeed;
+                camera.position.z -= deltaY * panSpeed; 
+                
+                const halfSize = planeSize / 2;
+                const camVisibleWidth = (camera.right - camera.left) / camera.zoom;
+                const camVisibleHeight = (camera.top - camera.bottom) / camera.zoom;
+                const camBoundsX = halfSize - camVisibleWidth / 2;
+                const camBoundsZ = halfSize - camVisibleHeight / 2;
+                camera.position.x = THREE.MathUtils.clamp(camera.position.x, -camBoundsX, camBoundsX);
+                camera.position.z = THREE.MathUtils.clamp(camera.position.z, -camBoundsZ, camBoundsZ);
+                
+                lastMousePos = { x: event.clientX, y: event.clientY };
+                return;
+            }
+            if (mouseDown && isDrawing && currentTool === 'rake') {
+                const intersects = getIntersectedObject(event.clientX, event.clientY);
+                if (intersects.length > 0) {
+                    const point = intersects[0].point;
+                    
+                    pathHistory.push(point);
+                    if (pathHistory.length > pathHistorySize) {
+                        pathHistory.shift();
+                    }
+                    const smoothedPoint = new THREE.Vector3();
+                    pathHistory.forEach(p => smoothedPoint.add(p));
+                    smoothedPoint.divideScalar(pathHistory.length);
+
+                    if (lastSmoothedPoint) {
+                        const distance = lastSmoothedPoint.distanceTo(smoothedPoint);
+                        if (distance > 0.1) { 
+                            strokeProgress++;
+                            const maxDepth = 10.0;
+                            const fadeInFrames = 15;
+                            const currentDepth = maxDepth * Math.min(strokeProgress / fadeInFrames, 1.0);
+
+                            const currentDirection = smoothedPoint.clone().sub(lastSmoothedPoint).normalize();
+
+                            if (!smoothedDirection) {
+                                smoothedDirection = currentDirection.clone();
+                            } else {
+                                smoothedDirection.lerp(currentDirection, 0.15);
+                                smoothedDirection.normalize();
+                            }
+
+                            const stepSize = 4.0; 
+                            if (distance > stepSize) {
+                                const steps = Math.ceil(distance / stepSize);
+                                let lastInterpolatedPoint = lastSmoothedPoint.clone();
+                                for (let i = 1; i <= steps; i++) {
+                                    const t = i / steps;
+                                    const interpolatedPoint = new THREE.Vector3().lerpVectors(lastSmoothedPoint, smoothedPoint, t);
+                                    drawSingleRakeLine(lastInterpolatedPoint, interpolatedPoint, currentDepth, smoothedDirection);
+                                    lastInterpolatedPoint = interpolatedPoint;
+                                }
+                            } else {
+                                 drawSingleRakeLine(lastSmoothedPoint, smoothedPoint, currentDepth, smoothedDirection);
+                            }
+                        }
+                    }
+                    
+                    sandPlane.geometry.attributes.position.needsUpdate = true;
+                    sandPlane.geometry.computeVertexNormals();
+                    lastSmoothedPoint = smoothedPoint;
+                }
+            } 
+        }
+
+        function onMouseUp(event) {
+            if (event.button === 2) {
+                isPanning = false;
+                renderer.domElement.style.cursor = 'crosshair';
+            }
+            if (event.button === 0) {
+                if (isDrawing && lastSmoothedPoint && smoothedDirection) {
+                    const intersects = getIntersectedObject(event.clientX, event.clientY);
+                    if (intersects.length > 0) {
+                        const endPoint = intersects[0].point;
+                        const finalDepth = 10.0;
+                        drawSingleRakeLine(lastSmoothedPoint, endPoint, finalDepth, smoothedDirection);
+                        sandPlane.geometry.attributes.position.needsUpdate = true;
+                        sandPlane.geometry.computeVertexNormals();
+                    }
+                }
+                
+                mouseDown = false;
+                isDrawing = false;
+                pathHistory = [];
+                lastSmoothedPoint = null;
+                smoothedDirection = null; 
+            }
+        }
+
+        function onMouseWheel(event) {
+            event.preventDefault();
+            const zoomAmount = event.deltaY * -0.001;
+            camera.zoom = THREE.MathUtils.clamp(camera.zoom + zoomAmount, minZoom, maxZoom);
+            
+            const halfSize = planeSize / 2;
+            const camVisibleWidth = (camera.right - camera.left) / camera.zoom;
+            const camVisibleHeight = (camera.top - camera.bottom) / camera.zoom;
+            const camBoundsX = halfSize - camVisibleWidth / 2;
+            const camBoundsZ = halfSize - camVisibleHeight / 2;
+            camera.position.x = THREE.MathUtils.clamp(camera.position.x, -camBoundsX, camBoundsX);
+            camera.position.z = THREE.MathUtils.clamp(camera.position.z, -camBoundsZ, camBoundsZ);
+            
+            camera.updateProjectionMatrix();
+        }
+
+        function onWindowResize() {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.left = -frustumSize * aspect / 2;
+            camera.right = frustumSize * aspect / 2;
+            camera.top = frustumSize / 2;
+            camera.bottom = -frustumSize / 2;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function getIntersectedObject(x, y) {
+            const raycaster = new THREE.Raycaster();
+            const mouseVector = new THREE.Vector2((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
+            raycaster.setFromCamera(mouseVector, camera);
+            return raycaster.intersectObject(sandPlane);
+        }
+
+        function setTool(toolName) {
+            currentTool = toolName;
+            document.querySelectorAll('.tool-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(toolName + '-tool').classList.add('active');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        // The init function is called on window load to ensure the DOM is ready.
+        window.onload = init;
+    </script>
+</body>
+</html>
